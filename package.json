@@ -1,6 +1,6 @@
 {
   "name": "cafe-order-manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Desktop POS for managing cafe orders with open tabs",
   "main": "./out/main/index.js",
   "author": "Cafe Order Manager",
@@ -13,6 +13,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "reset:history": "node scripts/reset-history.mjs",
+    "reset:seed": "node scripts/reset-to-seed.mjs",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win",
     "dist:linux": "npm run build && electron-builder --linux",
@@ -20,7 +21,8 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@types/react": "^19.0.10",

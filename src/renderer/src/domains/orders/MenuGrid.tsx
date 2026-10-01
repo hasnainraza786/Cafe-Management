@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { Category, Product } from '../../../shared/types'
+import type { Category, Product } from '../../../../shared/types'
 
 type Props = {
   products: Product[]

@@ -1,0 +1,126 @@
+.date-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.ledger-tx-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ledger-stat {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ledger-stat-label {
+  color: var(--cream-muted);
+  font-size: 0.88rem;
+}
+
+.ledger-stat strong {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.ledger-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.ledger-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ledger-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+}
+
+.ledger-entry-main {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.ledger-entry-main strong {
+  display: block;
+}
+
+.ledger-entry-main .muted {
+  display: block;
+  margin-top: 2px;
+}
+
+.ledger-entry-kind {
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--cream-muted);
+  white-space: nowrap;
+}
+
+.ledger-entry-kind.sale {
+  color: var(--accent-strong);
+}
+
+.ledger-entry-kind.credit_payment {
+  color: var(--success);
+}
+
+.ledger-entry-kind.expense {
+  color: var(--danger);
+}
+
+.ledger-entry-meta {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.amount-in {
+  color: var(--success);
+}
+
+.amount-out {
+  color: var(--danger);
+}
+
+@media (max-width: 700px) {
+  .ledger-entry {
+    flex-direction: column;
+  }
+
+  .ledger-entry-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

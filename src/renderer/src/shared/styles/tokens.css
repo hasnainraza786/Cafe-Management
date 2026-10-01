@@ -1,0 +1,18 @@
+:root {
+  --bg: #1c1410;
+  --bg-elevated: #2a1f18;
+  --bg-panel: #33261e;
+  --bg-soft: #3d2e24;
+  --cream: #f3e8d8;
+  --cream-muted: #d9cbb8;
+  --espresso: #5c3d2e;
+  --accent: #c4783a;
+  --accent-strong: #e08a42;
+  --success: #6f9b6d;
+  --danger: #c45c4a;
+  --border: rgba(243, 232, 216, 0.12);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  --radius: 14px;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+}

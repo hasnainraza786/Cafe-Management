@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  buildLedgerEntries,
   buildLedgerForDate,
   creditStatus,
   localDateKey,
   orderProfit,
   orderTotal,
   rebuildLedgers
-} from '../../../shared/normalize'
+} from '../../../../shared/normalize'
 import type {
   CafeTable,
   Category,
@@ -17,14 +18,13 @@ import type {
   Customer,
   DailyLedger,
   Expense,
+  LedgerEntry,
   OpenTab,
   OrderItem,
   Product,
   SettleMode,
   Store
-} from '../../../shared/types'
-
-export type AppView = 'pos' | 'menu' | 'history' | 'ledger' | 'credit' | 'expenses'
+} from '../../../../shared/types'
 
 function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
@@ -56,10 +56,9 @@ function withLedgers(store: Store): Store {
   }
 }
 
-export function useCafeStore() {
+export function useCafeStoreState() {
   const [store, setStore] = useState<Store | null>(null)
   const [activeTabId, setActiveTabId] = useState<string | null>(null)
-  const [view, setView] = useState<AppView>('pos')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -122,6 +121,47 @@ export function useCafeStore() {
       }
       await persist({
         ...store,
+        openTabs: [...store.openTabs, tab]
+      })
+      setActiveTabId(tab.id)
+    },
+    [store, persist]
+  )
+
+  const createCustomerTab = useCallback(
+    async (rawName: string) => {
+      if (!store) return
+      const name = rawName.trim()
+      if (!name) return
+
+      const existingCustomer = store.customers.find(
+        (customer) => customer.name.toLowerCase() === name.toLowerCase()
+      )
+      const customer = existingCustomer ?? { id: newId('cust'), name }
+      const customers = existingCustomer ? store.customers : [...store.customers, customer]
+
+      const alreadyOpen = store.openTabs.find(
+        (tab) => tab.kind === 'customer' && tab.refId === customer.id
+      )
+      if (alreadyOpen) {
+        if (!existingCustomer) {
+          await persist({ ...store, customers })
+        }
+        setActiveTabId(alreadyOpen.id)
+        return
+      }
+
+      const tab: OpenTab = {
+        id: newId('tab'),
+        name: customer.name,
+        kind: 'customer',
+        refId: customer.id,
+        createdAt: new Date().toISOString(),
+        items: []
+      }
+      await persist({
+        ...store,
+        customers,
         openTabs: [...store.openTabs, tab]
       })
       setActiveTabId(tab.id)
@@ -259,12 +299,20 @@ export function useCafeStore() {
     [store, activeTab, persist]
   )
 
-  const cancelTab = useCallback(async () => {
-    if (!store || !activeTabId) return
-    const nextTabs = store.openTabs.filter((tab) => tab.id !== activeTabId)
-    await persist({ ...store, openTabs: nextTabs })
-    setActiveTabId(nextTabs[0]?.id ?? null)
-  }, [store, activeTabId, persist])
+  const cancelTab = useCallback(
+    async (tabId?: string) => {
+      if (!store) return
+      const targetId = tabId ?? activeTabId
+      if (!targetId) return
+      const nextTabs = store.openTabs.filter((tab) => tab.id !== targetId)
+      await persist({ ...store, openTabs: nextTabs })
+      setActiveTabId((current) => {
+        if (current !== targetId) return current
+        return nextTabs[0]?.id ?? null
+      })
+    },
+    [store, activeTabId, persist]
+  )
 
   const saveProduct = useCallback(
     async (product: Product) => {
@@ -518,16 +566,23 @@ export function useCafeStore() {
     [store]
   )
 
+  const getLedgerEntries = useCallback(
+    (from: string, to: string): LedgerEntry[] => {
+      if (!store) return []
+      return buildLedgerEntries(store.history, store.credits, store.expenses, from, to)
+    },
+    [store]
+  )
+
   return {
     store: store ?? emptyStore(),
     loading,
     error,
-    view,
-    setView,
     activeTabId,
     setActiveTabId,
     activeTab,
     createTab,
+    createCustomerTab,
     addProductToActiveTab,
     changeQty,
     removeItem,
@@ -545,6 +600,7 @@ export function useCafeStore() {
     addExpense,
     deleteExpense,
     getLedgerForDate,
+    getLedgerEntries,
     todayKey: localDateKey(new Date().toISOString())
   }
 }

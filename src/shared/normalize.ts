@@ -8,6 +8,7 @@ import type {
   Customer,
   DailyLedger,
   Expense,
+  LedgerEntry,
   OpenTab,
   OrderItem,
   PaymentMode,
@@ -175,7 +176,6 @@ export function buildLedgerForDate(
 
   for (const order of history) {
     if (localDateKey(order.completedAt) !== date) continue
-    if (order.paymentMode === 'credit') continue
 
     totalSales += order.total
     totalProfit += order.profit
@@ -187,14 +187,24 @@ export function buildLedgerForDate(
   for (const credit of credits) {
     for (const payment of credit.payments) {
       if (localDateKey(payment.paidAt) !== date) continue
-      const ratio = credit.total > 0 ? payment.amount / credit.total : 0
-      totalSales += payment.amount
-      totalProfit += credit.profit * ratio
-      byPayment.credit += payment.amount
       creditCollected += payment.amount
-      addScaledItems(itemMap, credit.items, ratio)
     }
   }
+
+  const dayCredits = credits
+    .filter((credit) => localDateKey(credit.createdAt) === date)
+    .map((credit) => ({
+      id: credit.id,
+      orderNo: credit.orderNo,
+      customerName: credit.customerName,
+      total: credit.total,
+      paidAmount: credit.paidAmount,
+      status: credit.status,
+      createdAt: credit.createdAt
+    }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+
+  const creditGiven = dayCredits.reduce((sum, credit) => sum + credit.total, 0)
 
   const dayExpenses = expenses.filter((e) => e.date === date)
   const totalExpenses = dayExpenses.reduce((sum, e) => sum + e.amount, 0)
@@ -216,6 +226,7 @@ export function buildLedgerForDate(
     totalExpenses,
     netProfit: totalProfit - totalExpenses,
     orderCount,
+    creditGiven,
     creditCollected,
     byPayment,
     items: items.map((item) => ({
@@ -223,7 +234,8 @@ export function buildLedgerForDate(
       qty: Number(item.qty.toFixed(2))
     })),
     topItem: top,
-    expenses: dayExpenses
+    expenses: dayExpenses,
+    credits: dayCredits
   }
 }
 
@@ -234,9 +246,10 @@ export function rebuildLedgers(
 ): DailyLedger[] {
   const dates = new Set<string>()
   for (const order of history) {
-    if (order.paymentMode !== 'credit') dates.add(localDateKey(order.completedAt))
+    dates.add(localDateKey(order.completedAt))
   }
   for (const credit of credits) {
+    dates.add(localDateKey(credit.createdAt))
     for (const payment of credit.payments) {
       dates.add(localDateKey(payment.paidAt))
     }
@@ -248,6 +261,77 @@ export function rebuildLedgers(
   return Array.from(dates)
     .sort((a, b) => b.localeCompare(a))
     .map((date) => buildLedgerForDate(history, credits, expenses, date))
+}
+
+function inDateRange(dateKey: string, from: string, to: string): boolean {
+  const start = from <= to ? from : to
+  const end = from <= to ? to : from
+  return dateKey >= start && dateKey <= end
+}
+
+/** Chronological transaction ledger entries for a from–to date range. */
+export function buildLedgerEntries(
+  history: CompletedOrder[],
+  credits: CreditRecord[],
+  expenses: Expense[],
+  from: string,
+  to: string
+): LedgerEntry[] {
+  const entries: LedgerEntry[] = []
+
+  for (const order of history) {
+    const date = localDateKey(order.completedAt)
+    if (!inDateRange(date, from, to)) continue
+    const paymentLabel =
+      order.paymentMode.charAt(0).toUpperCase() + order.paymentMode.slice(1)
+    const itemSummary = order.items
+      .map((item) => `${item.qty}× ${item.name}`)
+      .join(', ')
+    entries.push({
+      id: `sale_${order.id}`,
+      kind: 'sale',
+      at: order.completedAt,
+      date,
+      title: `Order #${order.orderNo} · ${order.tabName}`,
+      detail: `${paymentLabel}${order.customerName ? ` · ${order.customerName}` : ''} · ${itemSummary}`,
+      amount: order.total,
+      cashAmount: order.paymentMode === 'credit' ? 0 : order.total
+    })
+  }
+
+  for (const credit of credits) {
+    for (const payment of credit.payments) {
+      const date = localDateKey(payment.paidAt)
+      if (!inDateRange(date, from, to)) continue
+      const method = payment.method.charAt(0).toUpperCase() + payment.method.slice(1)
+      entries.push({
+        id: `cpay_${payment.id}`,
+        kind: 'credit_payment',
+        at: payment.paidAt,
+        date,
+        title: `Credit collected · ${credit.customerName}`,
+        detail: `Order #${credit.orderNo} · via ${method}`,
+        amount: payment.amount,
+        cashAmount: payment.amount
+      })
+    }
+  }
+
+  for (const expense of expenses) {
+    if (!inDateRange(expense.date, from, to)) continue
+    entries.push({
+      id: `exp_${expense.id}`,
+      kind: 'expense',
+      at: expense.createdAt,
+      date: expense.date,
+      title: `Expense · ${expense.note}`,
+      detail: expense.date,
+      amount: -expense.amount,
+      cashAmount: -expense.amount
+    })
+  }
+
+  return entries.sort((a, b) => b.at.localeCompare(a.at) || b.id.localeCompare(a.id))
 }
 
 function id(prefix: string): string {

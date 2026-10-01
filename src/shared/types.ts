@@ -97,6 +97,16 @@ export type DailyItemSale = {
   profit: number
 }
 
+export type DailyCreditEntry = {
+  id: string
+  orderNo: number
+  customerName: string
+  total: number
+  paidAmount: number
+  status: CreditRecord['status']
+  createdAt: string
+}
+
 export type DailyLedger = {
   date: string
   totalSales: number
@@ -104,11 +114,29 @@ export type DailyLedger = {
   totalExpenses: number
   netProfit: number
   orderCount: number
+  creditGiven: number
   creditCollected: number
   byPayment: Record<PaymentMode, number>
   items: DailyItemSale[]
   topItem: { productId: string; name: string; qty: number; revenue: number } | null
   expenses: Expense[]
+  credits: DailyCreditEntry[]
+}
+
+/** A single chronological book entry for the transaction ledger. */
+export type LedgerEntryKind = 'sale' | 'credit_payment' | 'expense'
+
+export type LedgerEntry = {
+  id: string
+  kind: LedgerEntryKind
+  at: string
+  date: string
+  title: string
+  detail: string
+  /** Positive = money in / receivable sale; negative = money out (expense). */
+  amount: number
+  /** Cash-impacting amount (credit sales are 0 until collected). */
+  cashAmount: number
 }
 
 export type Store = {

@@ -1,0 +1,137 @@
+.history-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.history-layout > * {
+  min-height: 0;
+}
+
+.history-view > h2 {
+  flex-shrink: 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.history-header h2 {
+  margin-bottom: 4px;
+}
+
+.history-header .muted {
+  margin: 0;
+}
+
+.date-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.history-card {
+  width: 100%;
+  text-align: left;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'no name'
+    'no date';
+  column-gap: 12px;
+  row-gap: 2px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.history-card:hover {
+  background: rgba(196, 120, 58, 0.12);
+}
+
+.history-card.active {
+  border-color: var(--accent);
+  background: rgba(196, 120, 58, 0.18);
+}
+
+.history-order-no {
+  grid-area: no;
+  align-self: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--accent-strong);
+}
+
+.history-tab-name {
+  grid-area: name;
+  color: var(--cream);
+}
+
+.history-date {
+  grid-area: date;
+  color: var(--cream-muted);
+  font-size: 0.9rem;
+}
+
+.history-detail {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.history-detail-header h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+}
+
+.history-detail-header .muted {
+  margin: 0;
+}
+
+.history-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  color: var(--cream-muted);
+  font-size: 0.95rem;
+}
+
+.history-meta-rows {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+

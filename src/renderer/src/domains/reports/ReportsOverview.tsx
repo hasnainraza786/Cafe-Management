@@ -1,49 +1,12 @@
-import { useMemo, useState } from 'react'
-import type { DailyLedger } from '../../../shared/types'
+import type { DailyLedger } from '../../../../shared/types'
 
 type Props = {
-  ledgers: DailyLedger[]
-  todayKey: string
-  getLedgerForDate: (date: string) => DailyLedger
+  ledger: DailyLedger
 }
 
-export function DailyLedgerView({ ledgers, todayKey, getLedgerForDate }: Props): React.JSX.Element {
-  const dateOptions = useMemo(() => {
-    const set = new Set(ledgers.map((l) => l.date))
-    set.add(todayKey)
-    return Array.from(set).sort((a, b) => b.localeCompare(a))
-  }, [ledgers, todayKey])
-
-  const [selectedDate, setSelectedDate] = useState(todayKey)
-  const ledger = getLedgerForDate(selectedDate)
-  const isToday = selectedDate === todayKey
-
+export function ReportsOverview({ ledger }: Props): React.JSX.Element {
   return (
-    <main className="ledger-view">
-      <div className="ledger-header">
-        <div>
-          <h2>{isToday ? "Today's ledger" : 'Daily ledger'}</h2>
-          <p className="muted">
-            Cash/online sales + collected credit − expenses. Unpaid credit is excluded.
-          </p>
-        </div>
-        <label className="date-picker">
-          Date
-          <input
-            type="date"
-            value={selectedDate}
-            max={todayKey}
-            onChange={(e) => setSelectedDate(e.target.value || todayKey)}
-            list="ledger-dates"
-          />
-          <datalist id="ledger-dates">
-            {dateOptions.map((date) => (
-              <option key={date} value={date} />
-            ))}
-          </datalist>
-        </label>
-      </div>
-
+    <>
       <section className="ledger-summary ledger-summary-wide">
         <article className="ledger-stat">
           <span className="ledger-stat-label">Recognized sales</span>
@@ -62,8 +25,12 @@ export function DailyLedgerView({ ledgers, todayKey, getLedgerForDate }: Props):
           <strong>Rs {ledger.netProfit.toFixed(0)}</strong>
         </article>
         <article className="ledger-stat">
-          <span className="ledger-stat-label">Paid orders</span>
+          <span className="ledger-stat-label">Orders</span>
           <strong>{ledger.orderCount}</strong>
+        </article>
+        <article className="ledger-stat">
+          <span className="ledger-stat-label">Credit given</span>
+          <strong>Rs {ledger.creditGiven.toFixed(0)}</strong>
         </article>
         <article className="ledger-stat">
           <span className="ledger-stat-label">Credit collected</span>
@@ -81,7 +48,7 @@ export function DailyLedgerView({ ledgers, todayKey, getLedgerForDate }: Props):
       </section>
 
       <section className="ledger-payments">
-        <h3>By payment (recognized)</h3>
+        <h3>By payment mode</h3>
         <div className="payment-summary-row">
           <span>Cash</span>
           <strong>Rs {ledger.byPayment.cash.toFixed(0)}</strong>
@@ -91,15 +58,15 @@ export function DailyLedgerView({ ledgers, todayKey, getLedgerForDate }: Props):
           <strong>Rs {ledger.byPayment.online.toFixed(0)}</strong>
         </div>
         <div className="payment-summary-row">
-          <span>Credit collected</span>
+          <span>Credit</span>
           <strong>Rs {ledger.byPayment.credit.toFixed(0)}</strong>
         </div>
       </section>
 
       <section className="ledger-items">
-        <h3>Item sales (recognized)</h3>
+        <h3>Item sales</h3>
         {ledger.items.length === 0 ? (
-          <p className="empty-hint">No recognized sales for this date</p>
+          <p className="empty-hint">No sales for this date</p>
         ) : (
           <ul className="ledger-item-list">
             {ledger.items.map((item) => (
@@ -119,26 +86,6 @@ export function DailyLedgerView({ ledgers, todayKey, getLedgerForDate }: Props):
           </ul>
         )}
       </section>
-
-      <section className="ledger-items">
-        <h3>Expenses</h3>
-        {ledger.expenses.length === 0 ? (
-          <p className="empty-hint">No expenses for this date</p>
-        ) : (
-          <ul className="ledger-item-list">
-            {ledger.expenses.map((expense) => (
-              <li key={expense.id} className="ledger-item-row">
-                <div>
-                  <strong>{expense.note}</strong>
-                </div>
-                <div className="ledger-item-profit">
-                  <strong>Rs {expense.amount.toFixed(0)}</strong>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
+    </>
   )
 }

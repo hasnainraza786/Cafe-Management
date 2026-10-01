@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import type { CheckoutInput, Customer, OpenTab, PaymentMode } from '../../../shared/types'
-import { tabTotal } from '../hooks/useCafeStore'
+import { useEffect, useMemo, useState } from 'react'
+import type { CheckoutInput, Customer, OpenTab, PaymentMode } from '../../../../shared/types'
+import { tabTotal } from '@renderer/shared/store'
+import { Button, ThemeSelect } from '@renderer/shared/ui'
 
 type Props = {
   tab: OpenTab | null
@@ -34,6 +35,16 @@ export function ActiveOrder({
     setCreditCustomerId('')
   }, [tab?.id])
 
+  const sortedCustomers = useMemo(
+    () => [...customers].sort((a, b) => a.name.localeCompare(b.name)),
+    [customers]
+  )
+
+  const customerOptions = useMemo(
+    () => sortedCustomers.map((customer) => ({ value: customer.id, label: customer.name })),
+    [sortedCustomers]
+  )
+
   if (!tab) {
     return (
       <aside className="active-order">
@@ -45,7 +56,6 @@ export function ActiveOrder({
 
   const total = tabTotal(tab.items)
   const needsCustomerForCredit = paymentMode === 'credit' && tab.kind === 'table'
-  const sortedCustomers = [...customers].sort((a, b) => a.name.localeCompare(b.name))
   const canCheckout =
     tab.items.length > 0 &&
     !confirming &&
@@ -136,35 +146,25 @@ export function ActiveOrder({
         {needsCustomerForCredit && (
           <label className="credit-customer-pick">
             Credit customer
-            <select
+            <ThemeSelect
               value={creditCustomerId}
-              onChange={(e) => setCreditCustomerId(e.target.value)}
-              required
-            >
-              <option value="">Select customer…</option>
-              {sortedCustomers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Select customer…"
+              aria-label="Credit customer"
+              options={customerOptions}
+              onChange={setCreditCustomerId}
+            />
             {sortedCustomers.length === 0 && (
               <span className="hint">Add a customer in the Credit tab first.</span>
             )}
           </label>
         )}
 
-        <button
-          type="button"
-          className="btn-primary"
-          disabled={!canCheckout}
-          onClick={() => handleCheckout()}
-        >
+        <Button variant="primary" block disabled={!canCheckout} onClick={() => handleCheckout()}>
           Checkout
-        </button>
-        <button type="button" className="btn-ghost" onClick={() => onCancel()}>
+        </Button>
+        <Button variant="ghost" block onClick={() => onCancel()}>
           Cancel tab
-        </button>
+        </Button>
       </div>
     </aside>
   )

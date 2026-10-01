@@ -1,0 +1,114 @@
+.customer-row {
+  align-items: stretch;
+}
+
+.customer-select {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+  border-radius: 8px;
+}
+
+.customer-select strong {
+  display: block;
+}
+
+.customer-select.active strong {
+  color: var(--accent-strong);
+}
+
+.compact-actions {
+  margin-top: 6px;
+  justify-content: flex-end;
+}
+
+.credit-record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.credit-record {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.credit-record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.credit-status {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--cream-muted);
+}
+
+.credit-status.open {
+  color: var(--accent-strong);
+}
+
+.credit-status.partial {
+  color: #e0c060;
+}
+
+.credit-status.paid {
+  color: var(--success);
+}
+
+.credit-pay-row {
+  display: grid;
+  grid-template-columns: 1fr minmax(96px, 110px) auto auto;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.credit-pay-row input {
+  padding: 0.4rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--cream);
+}
+
+.credit-method-select .theme-select-trigger {
+  min-height: 34px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.credit-payments {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  color: var(--cream-muted);
+  font-size: 0.88rem;
+}
+
+.credit-payments li {
+  padding: 2px 0;
+}
+
+@media (max-width: 900px) {
+  .credit-pay-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
