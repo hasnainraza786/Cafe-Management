@@ -12,7 +12,11 @@
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
-    "reset:history": "node scripts/reset-history.mjs"
+    "reset:history": "node scripts/reset-history.mjs",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "dist:dir": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -23,6 +27,7 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^34.5.8",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^3.0.0",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"

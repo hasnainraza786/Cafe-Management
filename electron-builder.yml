@@ -1,0 +1,30 @@
+appId: com.cafe.ordermanager
+productName: Cafe Order Manager
+copyright: Copyright © Cafe Order Manager
+directories:
+  output: release
+  buildResources: resources
+files:
+  - out/**/*
+asar: true
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: Cafe-Order-Manager-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Cafe Order Manager
+linux:
+  target:
+    - AppImage
+  category: Office
+  artifactName: Cafe-Order-Manager-${version}.${ext}
+mac:
+  target:
+    - dmg
+  artifactName: Cafe-Order-Manager-${version}.${ext}

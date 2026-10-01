@@ -21,6 +21,43 @@ npm run dev
 npm run build
 ```
 
+## Package installer (`.exe`)
+
+Build a Windows installer (best on Windows, or via GitHub Actions below):
+
+```bash
+npm run dist:win
+```
+
+Output file:
+
+```text
+release/Cafe-Order-Manager-Setup-1.0.0.exe
+```
+
+Other commands:
+
+```bash
+npm run dist:linux   # AppImage (on Linux)
+npm run dist         # current OS default
+```
+
+### Free Windows build from Linux (GitHub Actions)
+
+1. Push this repo (including `.github/workflows/build-windows.yml`)
+2. Create and push a version tag:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+3. Wait for the Actions run to finish
+4. Download the `.exe` from the GitHub Release page:
+   `https://github.com/hasnainraza786/Cafe-Management/releases/tag/v1.0.0`
+
+Or run the workflow manually: **Actions → Build Windows installer → Run workflow**, then download the artifact.
+
 ## Reset history & ledger
 
 Clears completed orders, credit records, and daily ledgers (keeps products, categories, tables, customers, expenses, open tabs):
